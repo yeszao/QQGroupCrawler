@@ -1,5 +1,6 @@
+import random
 import time
-from datetime import datetime
+from selenium.common.exceptions import NoSuchElementException
 
 from lxml import html
 from selenium import webdriver
@@ -50,7 +51,7 @@ def login(start_qq: int):
         url = f"https://qun.qq.com/member.html#gid={group.gid}"
         driver.get(url)
         driver.refresh()
-        scroll_left_to_bottom(driver)
+        scroll_to_bottom(driver)
 
         num, members = get_qq_members(driver.page_source)
         for member in members:
@@ -112,18 +113,22 @@ def get_qq_members(page_source) -> (int, list):
     return group_member_num, members
 
 
-def scroll_left_to_bottom(driver):
-    old_height = driver.execute_script("return document.body.scrollHeight;")
+def scroll_to_bottom(driver):
+    wait = WebDriverWait(driver, 20)
+    wait.until(EC.visibility_of_element_located((By.XPATH, '//span[@id="groupMemberNum"]')))
+
+    html = etree.HTML(driver.page_source)
+    expected_num = int(html.xpath('//span[@id="groupMemberNum"]/text()')[0])
+
     while True:
-        driver.execute_script(
-            'window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"})')
+        driver.execute_script('window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"})')
+        time.sleep(random.randint(1, 3))
 
-        time.sleep(3.5)
-        new_height = driver.execute_script("return document.body.scrollHeight;")
-        if new_height == old_height:
+        try:
+            driver.find_element(By.XPATH, f'//td[@class="td-no" and text() = "{expected_num}"]')
             break
-
-        old_height = new_height
+        except NoSuchElementException as e:
+            continue
 
 
 def sendmail(user):
