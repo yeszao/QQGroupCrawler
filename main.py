@@ -34,7 +34,7 @@ def login(start_qq: int):
     time.sleep(8)
 
     # get groups
-    wait = WebDriverWait(driver, 15)
+    wait = WebDriverWait(driver, 20)
     wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@class="ui-dialog on"]')))
 
     time.sleep(1)
@@ -52,11 +52,16 @@ def login(start_qq: int):
         driver.refresh()
         scroll_left_to_bottom(driver)
 
-        members = get_qq_members(driver.page_source)
+        num, members = get_qq_members(driver.page_source)
         for member in members:
             save_member(member, group.gid)
 
-        set_group_crawled(group.gid)
+        if len(members) >= num:
+            set_group_crawled(group.gid)
+            print(f"Group [{group.gid}][{group.name}] has [{num}] members, all members are crawled.")
+        else:
+            print(f"Group [{group.gid}][{group.name}] has [{num}] members, but only [{len(members)}] members are crawled.")
+
         time.sleep(3)
 
     return driver
@@ -78,9 +83,10 @@ def get_groups(page_source):
     return groups
 
 
-def get_qq_members(page_source):
+def get_qq_members(page_source) -> (int, list):
     html = etree.HTML(page_source)
     mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')
+    group_member_num = int(html.xpath('//span[@id="groupMemberNum"]/text()')[0])
     members = []
 
     for mem_info in mem_info_list:
@@ -102,7 +108,7 @@ def get_qq_members(page_source):
         )
         members.append(member)
 
-    return members
+    return group_member_num, members
 
 
 def scroll_left_to_bottom(driver):
@@ -111,7 +117,7 @@ def scroll_left_to_bottom(driver):
         driver.execute_script(
             'window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"})')
 
-        time.sleep(2.5)
+        time.sleep(3.5)
         new_height = driver.execute_script("return document.body.scrollHeight;")
         if new_height == old_height:
             break

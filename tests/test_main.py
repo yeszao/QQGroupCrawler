@@ -4,13 +4,13 @@ from main import get_qq_members, get_groups
 def test_get_data():
     with open("members1.html", "r") as f:
         content = f.read()
-    members = get_qq_members(content)
-    assert len(members) == 7
+    num, members = get_qq_members(content)
+    assert len(members) == num
 
     with open("members2.html", "r") as f:
         content = f.read()
-    members = get_qq_members(content)
-    assert len(members) == 8
+    num, members = get_qq_members(content)
+    assert len(members) == num
 
 
 def test_get_groups():
