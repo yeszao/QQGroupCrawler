@@ -42,7 +42,6 @@ def extract_group_info(fullname: str) -> (str, int):
 
 def get_data(page_source, gid):
     html = etree.HTML(page_source)
-    group_name = str(html.xpath('//span[@id="groupTit"]/text()')[0]).strip()
     mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')
 
     members = []
@@ -61,7 +60,6 @@ def get_data(page_source, gid):
             qq_age=qq_age,
             joint_at=datetime.strptime(joint_at, "%Y/%m/%d"),
             last_active_at=datetime.strptime(last_active_at, "%Y/%m/%d"),
-            group_name=group_name,
             group_id=int(gid),
         ))
 

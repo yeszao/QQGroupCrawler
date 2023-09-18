@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Date, Text, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, DateTime, Date, Text, ForeignKey, Table, Boolean
 
 from db.engine import Base, DbEngine
 
@@ -35,6 +35,8 @@ class QqGroup(BaseEntity):
     __tablename__ = 'qq_groups'
     gid = Column(Integer, nullable=False, unique=True)
     name = Column(Text, nullable=False)
+    admin_qq = Column(Integer, nullable=False)
+    crawled = Column(Boolean, nullable=False, default=False)
 
 
 if __name__ == '__main__':

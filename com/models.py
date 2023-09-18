@@ -9,6 +9,3 @@ class GroupMember(BaseModel):
     qq_age: str
     joint_at: datetime
     last_active_at: datetime
-
-    group_name: str
-    group_id: int
