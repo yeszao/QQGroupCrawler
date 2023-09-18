@@ -14,7 +14,7 @@ def format_date(d: str) -> date:
     try:
         return datetime.strptime(d, "%Y/%m/%d").date()
     except ValueError:
-        return datetime.now().date()
+        return datetime.min.date()
 
 
 def convert_to_date(time_ago: str) -> date:
