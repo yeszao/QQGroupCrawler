@@ -10,4 +10,4 @@ class GroupMember(BaseModel):
     qq_created_at: date
     joint_at: date
     last_active_at: date
-    gid: int
+

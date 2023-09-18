@@ -17,14 +17,25 @@ def set_group_crawled(gid: int):
         session.commit()
 
 
-def save_member(m: GroupMember):
+def get_or_add_group(g: dict, login_qq: int) -> QqGroup:
+    with DbSession() as session:
+        group = session.query(QqGroup).filter(QqGroup.gid == g["gid"]).first()
+        if group is None:
+            group = QqGroup(gid=g["gid"], name=g["name"], login_qq=login_qq)
+            session.add(group)
+            session.commit()
+
+        return group
+
+
+def save_member(m: GroupMember, gid: int):
     with DbSession() as session:
         user = session.query(QqUser).filter(QqUser.qq == m.qq).first()
         if user is None:
             user = QqUser(nickname=m.nickname, qq=m.qq, gender=m.gender, qq_age=m.qq_age, qq_created_at=m.qq_created_at)
             session.add(user)
 
-        group = session.query(QqGroup).filter(QqGroup.gid == m.gid).first()
+        group = session.query(QqGroup).filter(QqGroup.gid == gid).first()
 
         new_association = {
             'qq': user.qq,

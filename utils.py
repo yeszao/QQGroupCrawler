@@ -10,6 +10,13 @@ def get_now() -> datetime:
     return datetime.now(tz=tz)
 
 
+def format_date(d: str) -> date:
+    try:
+        return datetime.strptime(d, "%Y/%m/%d").date()
+    except ValueError:
+        return datetime.now().date()
+
+
 def convert_to_date(time_ago: str) -> date:
     match = re.match(r'(\d+)\s*(天|年|个月|月)', time_ago)
     if not match:

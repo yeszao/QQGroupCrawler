@@ -5,11 +5,14 @@ from lxml import html
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 from com.SendMailUtil import SendMail
 from com.models import GroupMember
-from db.dao import get_groups, save_member, set_group_crawled
-from utils import convert_to_date
+from db.dao import save_member, set_group_crawled, get_or_add_group
+from utils import convert_to_date, format_date
 
 etree = html.etree
 
@@ -24,37 +27,69 @@ def parser():
     return driver
 
 
-def login(gid):
-    url = f"https://qun.qq.com/member.html#gid={gid}"
+def login(start_qq: int):
+    url = f"https://qun.qq.com/member.html"
     driver = parser()
     driver.get(url)
     time.sleep(8)
 
-    scroll_left_to_bottom(driver)
-    page_source = driver.page_source
-    get_data(page_source, gid)
+    # get groups
+    wait = WebDriverWait(driver, 15)
+    wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@class="ui-dialog on"]')))
+
+    time.sleep(1)
+    groups = get_groups(driver.page_source)
+    new_groups = []
+    for group in groups:
+        new_groups.append(get_or_add_group(group, start_qq))
+
+    for group in new_groups:
+        if group.crawled:
+            continue
+
+        url = f"https://qun.qq.com/member.html#gid={group.gid}"
+        driver.get(url)
+        driver.refresh()
+        scroll_left_to_bottom(driver)
+
+        members = get_qq_members(driver.page_source)
+        for member in members:
+            save_member(member, group.gid)
+
+        set_group_crawled(group.gid)
+        time.sleep(3)
 
     return driver
 
 
-def extract_group_info(fullname: str) -> (str, int):
-    group_name = fullname.split('(')[0]
-    group_id = int(fullname.split('(')[1].split(')')[0])
-    return group_name, group_id
+def get_groups(page_source):
+    html = etree.HTML(page_source)
+    xpaths = html.xpath('//ul[@class="my-group-list"]/li')
+
+    groups = []
+    for mem_info in xpaths:
+        gid = int(str(mem_info.xpath('./@data-id')[0]).strip())
+        group_name = str(mem_info.xpath('./@title')[0]).strip().replace('&nbsp;', ' ')
+        groups.append({
+            "gid": gid,
+            "name": group_name
+        })
+
+    return groups
 
 
-def get_data(page_source, gid):
+def get_qq_members(page_source):
     html = etree.HTML(page_source)
     mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')
-
     members = []
+
     for mem_info in mem_info_list:
         nickname = str(mem_info.xpath('./td[3]/span/text()')[0]).strip()
-        qq = int(str(mem_info.xpath('./td[5]//text()')[0]).strip())
-        gender = str(mem_info.xpath('./td[6]//text()')[0]).strip()
-        qq_age = str(mem_info.xpath('./td[7]//text()')[0]).strip()
-        joint_at = str(mem_info.xpath('./td[8]//text()')[0]).strip()
-        last_active_at = str(mem_info.xpath('./td[9]//text()')[0]).strip()
+        qq = int(str(mem_info.xpath('./td[5]/text()')[0]).strip())
+        gender = str(mem_info.xpath('./td[6]/text()')[0]).strip()
+        qq_age = str(mem_info.xpath('./td[7]/text()')[0]).strip()
+        joint_at = str(mem_info.xpath('./td[8]/text()')[0]).strip()
+        last_active_at = str(mem_info.xpath('./td[last() - 1]/text()')[0]).strip()
 
         member = GroupMember(
             nickname=nickname,
@@ -62,12 +97,12 @@ def get_data(page_source, gid):
             gender=gender,
             qq_age=qq_age,
             qq_created_at=convert_to_date(qq_age),
-            joint_at=datetime.strptime(joint_at, "%Y/%m/%d"),
-            last_active_at=datetime.strptime(last_active_at, "%Y/%m/%d"),
-            gid=int(gid),
+            joint_at=format_date(joint_at),
+            last_active_at=format_date(last_active_at),
         )
+        members.append(member)
 
-        save_member(member)
+    return members
 
 
 def scroll_left_to_bottom(driver):
@@ -95,15 +130,11 @@ def logout(driver):
     driver.quit()
 
 
-def scroller(driver):
-    js = "var q=document.documentElement.scrollTop=100000"
-    driver.execute_script(js)
-
-
 if __name__ == '__main__':
-    groups = get_groups()
-    for group in groups:
-        print(f"Please login with your QQ: {group.login_qq}")
-        login(group.gid)
-        set_group_crawled(group.gid)
-        time.sleep(3)
+    login(2956311905)
+    # groups = get_groups()
+    # for group in groups:
+    #     print(f"Please login with your QQ: {group.login_qq}")
+    #     login(group.gid)
+    #     set_group_crawled(group.gid)
+    #     time.sleep(3)
