@@ -33,6 +33,7 @@ def get_data(driver, gid):
 
     data = driver.page_source
     html = etree.HTML(data)
+    group_title = html.xpath('//span[@id="groupTit"]/text()')
     mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')  # TODO  QQ群成员列表
 
     with open(f'{gid}.csv', 'a+', newline='', encoding='utf-8') as f:
