@@ -8,6 +8,8 @@ from selenium.webdriver.chrome.service import Service
 
 from com.SendMailUtil import SendMail
 from com.models import GroupMember
+from db.dao import get_groups, save_member, set_group_crawled
+from utils import convert_to_date
 
 etree = html.etree
 
@@ -22,7 +24,8 @@ def parser():
     return driver
 
 
-def login(url, gid):
+def login(gid):
+    url = f"https://qun.qq.com/member.html#gid={gid}"
     driver = parser()
     driver.get(url)
     time.sleep(8)
@@ -53,17 +56,18 @@ def get_data(page_source, gid):
         joint_at = str(mem_info.xpath('./td[8]//text()')[0]).strip()
         last_active_at = str(mem_info.xpath('./td[9]//text()')[0]).strip()
 
-        members.append(GroupMember(
+        member = GroupMember(
             nickname=nickname,
             qq=qq,
             gender=gender,
             qq_age=qq_age,
+            qq_created_at=convert_to_date(qq_age),
             joint_at=datetime.strptime(joint_at, "%Y/%m/%d"),
             last_active_at=datetime.strptime(last_active_at, "%Y/%m/%d"),
-            group_id=int(gid),
-        ))
+            gid=int(gid),
+        )
 
-    return members
+        save_member(member)
 
 
 def scroll_left_to_bottom(driver):
@@ -96,10 +100,10 @@ def scroller(driver):
     driver.execute_script(js)
 
 
-def run(gid):
-    url = "https://qun.qq.com/member.html#gid=" + gid
-    login(url, gid)
-
-
 if __name__ == '__main__':
-    run('879813761')
+    groups = get_groups()
+    for group in groups:
+        print(f"Please login with your QQ: {group.login_qq}")
+        login(group.gid)
+        set_group_crawled(group.gid)
+        time.sleep(3)

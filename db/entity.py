@@ -1,16 +1,15 @@
-from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Date, Text, ForeignKey, Table, Boolean
+from datetime import datetime, date
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, Date, Text, ForeignKey, Table, Boolean
 
 from db.engine import Base, DbEngine
 
-
-job_skill_association = Table('qq_users_groups_association',
-                              Base.metadata,
-                              Column('qq', Integer, ForeignKey('qq_users.qq')),
-                              Column('gid', Integer, ForeignKey('qq_groups.gid')),
-                              Column('joint_at', Date, nullable=False, default=datetime.min),
-                              Column('last_active_at', Date, nullable=False, default=datetime.min),
-                              )
+qq_users_groups_association = Table('qq_users_groups_association',
+                                    Base.metadata,
+                                    Column('qq', BigInteger, ForeignKey('qq_users.qq')),
+                                    Column('gid', BigInteger, ForeignKey('qq_groups.gid')),
+                                    Column('joint_at', Date, nullable=False, default=date.min),
+                                    Column('last_active_at', Date, nullable=False, default=date.min),
+                                    )
 
 
 class BaseEntity(Base):
@@ -26,20 +25,19 @@ class BaseEntity(Base):
 class QqUser(BaseEntity):
     __tablename__ = 'qq_users'
     nickname = Column(String(100), nullable=False, default='')
-    qq = Column(Integer, nullable=False, unique=True)
+    qq = Column(BigInteger, nullable=False, unique=True)
     gender = Column(String(2), nullable=False)
     qq_age = Column(String(5), nullable=False)
+    qq_created_at = Column(Date, nullable=False, default=date.today)
 
 
 class QqGroup(BaseEntity):
     __tablename__ = 'qq_groups'
-    gid = Column(Integer, nullable=False, unique=True)
+    gid = Column(BigInteger, nullable=False, unique=True)
     name = Column(Text, nullable=False)
-    admin_qq = Column(Integer, nullable=False)
+    login_qq = Column(BigInteger, nullable=False)
     crawled = Column(Boolean, nullable=False, default=False)
 
 
 if __name__ == '__main__':
     Base.metadata.create_all(DbEngine)
-
-

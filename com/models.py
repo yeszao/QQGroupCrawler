@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel
 
 
@@ -7,5 +7,7 @@ class GroupMember(BaseModel):
     qq: int
     gender: str
     qq_age: str
-    joint_at: datetime
-    last_active_at: datetime
+    qq_created_at: date
+    joint_at: date
+    last_active_at: date
+    gid: int
