@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, DateTime, Date, Text, ForeignKey, Table
 
 from db.engine import Base, DbEngine
 
@@ -8,8 +8,8 @@ job_skill_association = Table('qq_users_groups_association',
                               Base.metadata,
                               Column('qq', Integer, ForeignKey('qq_users.qq')),
                               Column('gid', Integer, ForeignKey('qq_groups.gid')),
-                              Column('joint_at', DateTime, nullable=False, default=datetime.min),
-                              Column('last_active_at', DateTime, nullable=False, default=datetime.min),
+                              Column('joint_at', Date, nullable=False, default=datetime.min),
+                              Column('last_active_at', Date, nullable=False, default=datetime.min),
                               )
 
 

@@ -1,0 +1,678 @@
+<html>
+<head>
+    <title>Example</title>
+</head>
+<body>
+<dl>
+    <dt>
+        <div class="group-tit">
+            <span id="groupTit">dnmp交流群3(878913761)</span> <a id="changeGroup" data-tag="changegroup">[切换QQ群]</a>
+        </div>
+    </dt>
+    <dd>
+        <div class="group-tools">
+            <div class="group-members" id="groupMemberTit">
+                群成员人数: <span id="groupMemberNum">500</span>/500
+
+                <button cmd="add" class="add-member" data-tag="addmember">添加成员</button>
+
+
+                <button cmd="set" disabled="" class="set-manage disabled" data-tag="setmanage">设置管理员</button>
+
+
+                <button cmd="del" disabled="" class="disabled del-member" data-tag="delmemberbtn">删除成员</button>
+
+
+            </div>
+            <div class="group-search">
+                <div class="group-input">
+                    <input type="text" id="searchValue" data-def="搜索关键词" value="搜索关键词">
+                    <button id="searchBtn" data-tag="search" class="icon-search-btn"></button>
+                </div>
+                <div class="group-select-btn" data-tag="more">
+                    <a data-tag="more">
+                        <span data-tag="more">更多筛选</span>
+                        <i data-tag="more" class="icon-arrow-blue"></i>
+                    </a>
+                </div>
+            </div>
+            <div id="moreAction">
+                <div class="child group-select-more hide">
+                    <div class="group-top">
+                        <div></div>
+                    </div>
+                    <ul data-key="credit" data-tag="信用" data-type="0">
+                        <li>
+                            <label>信　　用：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter">不良记录成员</li>
+                    </ul>
+                    <ul data-key="g" data-tag="性别" data-type="1">
+                        <li>
+                            <label>性　　别：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter">男</li>
+                        <li class="query-filter">女</li>
+                    </ul>
+                    <ul data-key="qage" data-tag="Q龄" data-type="2">
+                        <li>
+                            <label>Q　　龄：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter">1年内</li>
+                        <li class="query-filter">1年-3年</li>
+                        <li class="query-filter">3年-5年</li>
+                        <li class="query-filter">5-7年</li>
+                        <li class="query-filter">7年以上</li>
+                        <li class="query-filter sl" data-val="年"><input type="text" maxlength="2"> - <input type="text" maxlength="2"> 年</li>
+                    </ul>
+                    <ul data-key="join_time" data-tag="入群时长" data-type="3">
+                        <li>
+                            <label>入群时长：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter">1个月内</li>
+                        <li class="query-filter">1-3个月</li>
+                        <li class="query-filter">3-6个月</li>
+                        <li class="query-filter">6-12个月</li>
+                        <li class="query-filter">12个月以上</li>
+                        <li class="query-filter sl" data-val="月"><input type="text" maxlength="3"> - <input type="text" maxlength="3"> 月</li>
+                    </ul>
+                    <ul data-key="lv" id="groupLevel" class="hide" data-tag="群等级" data-type="5" style="display: none;">
+                        <li>
+                            <label>等　　级：</label>
+                        </li>
+                        <li class="query-filter selected" data-idx="0">不限</li>
+
+                    </ul>
+                    <ul data-key="last_speak_time" data-tag="最后发言" data-type="6">
+                        <li>
+                            <label>最后发言：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter">1个月内</li>
+                        <li class="query-filter">1-3个月</li>
+                        <li class="query-filter">3-6个月</li>
+                        <li class="query-filter">6-12个月</li>
+                        <li class="query-filter">12个月以上</li>
+                        <li class="query-filter sl" data-val="月"><input type="text" maxlength="3"> - <input type="text" maxlength="3"> 月</li>
+                    </ul>
+                    <ul id="join_method" data-key="join_method" data-tag="入群方式" data-type="7" style="display: none;">
+                        <li>
+                            <label>入群方式：</label>
+                        </li>
+                        <li></li>
+                        <div class="query-filter sl" data-val="" id="joinSelect">
+                            <select name="pets" id="petSelect">
+                                <option value="不限">不限</option>
+
+                            </select>
+                        </div>
+                    </ul>
+                    <ul id="join_invite" data-key="invite" data-tag="邀请人" data-type="4" style="display: none;">
+                        <li>
+                            <label>邀请人：</label>
+                        </li>
+                        <li class="query-filter selected">不限</li>
+                        <li class="query-filter sl" data-val=""><input type="text" style="width: 100px" maxlength="30"></li>
+                    </ul>
+                    <div class="group-select-more-btm" id="groupSelectMoreBtm">
+                        <div>筛选条件:</div>
+                        <div id="selectResultTips">
+                        </div>
+                        <div class="select-result">
+                            <button class="clear disabled" disabled="disabled">清除</button>
+                            <button class="submit" data-tag="moresub">确定</button>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="child group-select-result hide" id="groupSelectResult">
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="group-memeber">
+            <table cellspacing="0" cellpadding="0" border="0" width="100%" id="groupMember" align="center">
+                <tbody><tr id="groupTh">
+                    <th width="32" class="td-right">
+
+                        <input id="selectAll" type="checkbox" class="check-input">
+
+                    </th>
+                    <th width="30"></th>
+                    <th class="th-left1" width="200">成员</th>
+
+                    <th class="th-left th-card" width="170">群昵称</th>
+
+
+                    <th class="th-left" width="140">QQ号</th>
+                    <th class="th-left" width="105">性别</th>
+                    <th class="th-left th-desc" width="105">
+                        <div class="group-ff">
+                            <div class="group-desc">
+                                <a class="link">Q龄</a> <i class="arrow"></i> <i class="icon-more-select"></i>
+                                <ul class="group-desc-arrow">
+                                    <li cmd="desc" data-tag="age" data-idx="0" idx="0">默认</li>
+                                    <li cmd="desc" data-tag="age" data-idx="0" idx="9" order="0"><a data-tag="age" data-idx="0">Q龄</a> <i class="icon-arrow-desc"></i></li>
+                                    <li cmd="desc" data-tag="age" data-idx="1" idx="8" order="1"><a data-tag="age" data-idx="1">Q龄</a> <i class="icon-arrow-desc1"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="th-left th-desc" width="140">
+                        <div class="group-ff">
+                            <div class="group-desc">
+                                <a class="link">入群时间</a> <i class="arrow"></i> <i class="icon-more-select"></i>
+                                <ul class="group-desc-arrow">
+                                    <li cmd="desc" data-tag="jointime" data-idx="0" idx="0">默认</li>
+                                    <li cmd="desc" data-tag="jointime" data-idx="0" idx="11" order="0"><a data-tag="jointime" data-idx="0">入群时间</a> <i class="icon-arrow-desc"></i></li>
+                                    <li cmd="desc" data-tag="jointime" data-idx="1" idx="10" order="1"><a data-tag="jointime" data-idx="1">入群时间</a> <i class="icon-arrow-desc1"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
+
+
+                    <th class="th-left th-desc" width="110">
+                        <div class="group-ff">
+                            <div class="group-desc">
+                                <a class="link">最后发言</a> <i class="arrow"></i> <i class="icon-more-select"></i>
+                                <ul class="group-desc-arrow">
+                                    <li cmd="desc" data-tag="lastmsg" data-idx="0" idx="0">默认</li>
+                                    <li cmd="desc" data-tag="lastmsg" data-idx="0" idx="17" order="0"><a data-tag="orderspeak" data-idx="0">最后发言</a> <i class="icon-arrow-desc"></i></li>
+                                    <li cmd="desc" data-tag="lastmsg" data-idx="1" idx="16" order="1"><a data-tag="orderspeak" data-idx="1">最后发言</a> <i class="icon-arrow-desc1"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
+                    <th width="20"></th>
+                </tr>
+                </tbody>
+                <tbody class="list">
+
+                <tr class="mb mb673452643">
+                    <td class="td-right">
+
+
+
+                    </td>
+                    <td class="td-no">1</td>
+                    <td class="td-user-nick">
+
+                        <a class="group-master-a"><i class="icon-group-master"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=673452643&amp;s=140" id="useIcon673452643">
+
+                        <span>
+
+						清风
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card673452643">
+
+
+
+							</span>
+							<input class="member-card" id="member-card673452643" value="" type="text" data-old="" data-id="673452643">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        673452643
+
+                    </td>
+                    <td>
+
+                        男
+
+                    </td>
+                    <td>17年</td>
+                    <td>
+
+                        2022/02/11
+
+                    </td>
+
+
+                    <td>
+
+                        2023/04/30
+
+                    </td>
+                    <td class="td-delete">
+
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb153555712">
+                    <td class="td-right">
+
+
+                        <input id="input153555712" type="checkbox" class="check-input" value="153555712" data-type="1">
+
+
+                    </td>
+                    <td class="td-no">2</td>
+                    <td class="td-user-nick">
+
+                        <a class="group-manage-a"><i class="icon-group-manage manage153555712" title="取消管理员" data-tag="delmanage" data-id="153555712"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=153555712&amp;s=140" id="useIcon153555712">
+
+                        <span>
+
+						*镜面@王子*
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card153555712">
+
+
+
+							</span>
+							<input class="member-card" id="member-card153555712" value="" type="text" data-old="" data-id="153555712">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        153555712
+
+                    </td>
+                    <td>
+
+                        未知
+
+                    </td>
+                    <td>20年</td>
+                    <td>
+
+                        2022/02/12
+
+                    </td>
+
+
+                    <td>
+
+                        2023/09/05
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="153555712"></i>
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb1258088622">
+                    <td class="td-right">
+
+
+                        <input id="input1258088622" type="checkbox" class="check-input" value="1258088622" data-type="2">
+
+
+                    </td>
+                    <td class="td-no">3</td>
+                    <td class="td-user-nick">
+
+                        <a><i class="manage1258088622" data-id="1258088622"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=1258088622&amp;s=140" id="useIcon1258088622">
+
+                        <span>
+
+						码客
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card1258088622">
+
+
+
+							</span>
+							<input class="member-card" id="member-card1258088622" value="" type="text" data-old="" data-id="1258088622">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        1258088622
+
+                    </td>
+                    <td>
+
+                        未知
+
+                    </td>
+                    <td>5年</td>
+                    <td>
+
+                        2022/02/11
+
+                    </td>
+
+
+                    <td>
+
+                        2022/02/11
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="1258088622"></i>
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb576364760">
+                    <td class="td-right">
+
+
+                        <input id="input576364760" type="checkbox" class="check-input" value="576364760" data-type="2">
+
+
+                    </td>
+                    <td class="td-no">4</td>
+                    <td class="td-user-nick">
+
+                        <a><i class="manage576364760" data-id="576364760"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=576364760&amp;s=140" id="useIcon576364760">
+
+                        <span>
+
+						再见理想
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card576364760">
+
+
+
+							</span>
+							<input class="member-card" id="member-card576364760" value="" type="text" data-old="" data-id="576364760">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        576364760
+
+                    </td>
+                    <td>
+
+                        男
+
+                    </td>
+                    <td>16年</td>
+                    <td>
+
+                        2022/02/14
+
+                    </td>
+
+
+                    <td>
+
+                        2022/04/22
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="576364760"></i>
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb514263752">
+                    <td class="td-right">
+
+
+                        <input id="input514263752" type="checkbox" class="check-input" value="514263752" data-type="2">
+
+
+                    </td>
+                    <td class="td-no">5</td>
+                    <td class="td-user-nick">
+
+                        <a><i class="manage514263752" data-id="514263752"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=514263752&amp;s=140" id="useIcon514263752">
+
+                        <span>
+
+						JeffヾLeung
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card514263752">
+
+
+
+							</span>
+							<input class="member-card" id="member-card514263752" value="" type="text" data-old="" data-id="514263752">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        514263752
+
+                    </td>
+                    <td>
+
+                        男
+
+                    </td>
+                    <td>15年</td>
+                    <td>
+
+                        2022/02/14
+
+                    </td>
+
+
+                    <td>
+
+                        2022/02/28
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="514263752"></i>
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb553212441">
+                    <td class="td-right">
+
+
+                        <input id="input553212441" type="checkbox" class="check-input" value="553212441" data-type="2">
+
+
+                    </td>
+                    <td class="td-no">6</td>
+                    <td class="td-user-nick">
+
+                        <a><i class="manage553212441" data-id="553212441"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=553212441&amp;s=140" id="useIcon553212441">
+
+                        <span>
+
+						可以~假如
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card553212441">
+
+
+
+							</span>
+							<input class="member-card" id="member-card553212441" value="" type="text" data-old="" data-id="553212441">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        553212441
+
+                    </td>
+                    <td>
+
+                        男
+
+                    </td>
+                    <td>17年</td>
+                    <td>
+
+                        2022/02/15
+
+                    </td>
+
+
+                    <td>
+
+                        2022/03/12
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="553212441"></i>
+
+
+                    </td>
+                </tr>
+
+                <tr class="mb mb306088569">
+                    <td class="td-right">
+
+
+                        <input id="input306088569" type="checkbox" class="check-input" value="306088569" data-type="2">
+
+
+                    </td>
+                    <td class="td-no">7</td>
+                    <td class="td-user-nick">
+
+                        <a><i class="manage306088569" data-id="306088569"></i></a>
+
+                        <img class="" src="//q4.qlogo.cn/g?b=qq&amp;nk=306088569&amp;s=140" id="useIcon306088569">
+
+                        <span>
+
+						xm8
+
+				</span>
+                    </td>
+
+                    <td class="td-card">
+
+						<span>
+							<span class="group-card group-card306088569">
+
+
+
+							</span>
+							<input class="member-card" id="member-card306088569" value="" type="text" data-old="" data-id="306088569">
+						</span>
+
+                    </td>
+
+
+                    <td>
+
+                        306088569
+
+                    </td>
+                    <td>
+
+                        男
+
+                    </td>
+                    <td>14年</td>
+                    <td>
+
+                        2022/02/15
+
+                    </td>
+
+
+                    <td>
+
+                        2023/03/22
+
+                    </td>
+                    <td class="td-delete">
+
+
+                        <i class="icon-close" title="删除该成员" data-tag="delmemberico" data-id="306088569"></i>
+
+
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+            <div id="searchEmpty" style="display: none;"></div>
+        </div>
+
+    </dd>
+</dl>
+</body>
+</html>

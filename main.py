@@ -1,11 +1,13 @@
-import csv
 import time
+from datetime import datetime
+
 from lxml import html
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 
 from com.SendMailUtil import SendMail
+from com.models import GroupMember
 
 etree = html.etree
 
@@ -24,45 +26,46 @@ def login(url, gid):
     driver = parser()
     driver.get(url)
     time.sleep(8)
-    get_data(driver, gid)
+
+    scroll_left_to_bottom(driver)
+    page_source = driver.page_source
+    get_data(page_source, gid)
+
     return driver
 
 
-def get_data(driver, gid):
-    scroll_left_to_bottom(driver)
+def extract_group_info(fullname: str) -> (str, int):
+    group_name = fullname.split('(')[0]
+    group_id = int(fullname.split('(')[1].split(')')[0])
+    return group_name, group_id
 
-    data = driver.page_source
-    html = etree.HTML(data)
-    group_title = html.xpath('//span[@id="groupTit"]/text()')
-    mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')  # TODO  QQ群成员列表
 
-    with open(f'{gid}.csv', 'a+', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f, dialect="excel")
-        writer.writerow(['成员', 'QQ号', '性别', 'Q龄', '入群时间', '最后发言'])
+def get_data(page_source, gid):
+    html = etree.HTML(page_source)
+    group_name = str(html.xpath('//span[@id="groupTit"]/text()')[0]).strip()
+    mem_info_list = html.xpath('//*[@id="groupMember"]/tbody[@class="list"]/tr')
 
-        for mem_info in mem_info_list:
+    members = []
+    for mem_info in mem_info_list:
+        nickname = str(mem_info.xpath('./td[3]/span/text()')[0]).strip()
+        qq = int(str(mem_info.xpath('./td[5]//text()')[0]).strip())
+        gender = str(mem_info.xpath('./td[6]//text()')[0]).strip()
+        qq_age = str(mem_info.xpath('./td[7]//text()')[0]).strip()
+        joint_at = str(mem_info.xpath('./td[8]//text()')[0]).strip()
+        last_active_at = str(mem_info.xpath('./td[9]//text()')[0]).strip()
 
-            data = {'成员': str(mem_info.xpath('./td[3]//text()')[3]).replace('\U0001f60a', '').strip(),
-                    'QQ号': str(mem_info.xpath('./td[5]//text()')[0]).replace('\U0001f60a', '').strip(),
-                    '性别': str(mem_info.xpath('./td[6]//text()')[0]).replace('\U0001f60a', '').strip(),
-                    'Q龄': str(mem_info.xpath('./td[7]//text()')[0]).replace('\U0001f60a', '').strip(),
-                    '入群时间': str(mem_info.xpath('./td[8]//text()')[0]).replace('\U0001f60a', '').strip(),
-                    '最后发言': str(mem_info.xpath('./td[9]//text()')[0]).replace('\U0001f60a', '').strip()}
-            print(data)
+        members.append(GroupMember(
+            nickname=nickname,
+            qq=qq,
+            gender=gender,
+            qq_age=qq_age,
+            joint_at=datetime.strptime(joint_at, "%Y/%m/%d"),
+            last_active_at=datetime.strptime(last_active_at, "%Y/%m/%d"),
+            group_name=group_name,
+            group_id=int(gid),
+        ))
 
-            if data:
-                # writer.writerow(['成员', 'QQ号', '性别', 'Q龄', '入群时间', '最后发言'])
-                # writer.writerow(
-                #     [data['成员'].replace('\xa0', ''), data['QQ号'].replace('\xa0', ''),
-                #      data['性别'].replace('\xa0', ''), data['Q龄'].replace('\xa0', ''),
-                #      data['入群时间'].replace('\xa0', ''), data['最后发言'].replace('\xa0', '')])
-                writer.writerow(
-                    [data['成员'], data['QQ号'],
-                     data['性别'], data['Q龄'],
-                     data['入群时间'], data['最后发言']])
-
-                # 发送邮件
-                #sendmail(data['QQ号'] + "@qq.com");
+    return members
 
 
 def scroll_left_to_bottom(driver):
