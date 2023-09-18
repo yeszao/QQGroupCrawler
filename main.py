@@ -58,12 +58,13 @@ def login(start_qq: int):
 
         if len(members) >= num:
             set_group_crawled(group.gid)
-            print(f"Group [{group.gid}][{group.name}] has [{num}] members, all members are crawled.")
+            print(f"[{group.gid}] [{group.name}] [{len(members)}/{num}] crawled, SUCCESS.")
         else:
-            print(f"Group [{group.gid}][{group.name}] has [{num}] members, but only [{len(members)}] members are crawled.")
+            print(f"[{group.gid}] [{group.name}] [{len(members)}/{num}] crawled, FAILED!")
 
         time.sleep(3)
 
+    print("All done.")
     return driver
 
 
