@@ -18,14 +18,15 @@ def set_group_crawled(gid: int):
 
 
 def get_or_add_group(g: dict, login_qq: int) -> QqGroup:
+    new_group = QqGroup(gid=g["gid"], name=g["name"], login_qq=login_qq, crawled=False)
     with DbSession() as session:
         group = session.query(QqGroup).filter(QqGroup.gid == g["gid"]).first()
-        if group is None:
-            group = QqGroup(gid=g["gid"], name=g["name"], login_qq=login_qq)
-            session.add(group)
-            session.commit()
+        if group:
+            return group
 
-        return group
+        session.add(new_group)
+        session.commit()
+        return new_group
 
 
 def save_member(m: GroupMember, gid: int):
