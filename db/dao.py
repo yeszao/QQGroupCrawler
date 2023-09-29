@@ -1,5 +1,5 @@
 from typing import List
-
+from sqlalchemy import text
 from com.models import GroupMember
 from db.engine import DbSession
 from db.entity import QqGroup, QqUser, qq_users_groups_association
@@ -49,3 +49,23 @@ def save_member(m: GroupMember, gid: int):
         session.commit()
 
 
+def get_qqs(send_email_group: str, limit: int) -> List[int]:
+    with DbSession() as session:
+        sql = text("""
+            select distinct qu.qq from qq_users qu
+            inner join qq_users_groups_association quga on qu.qq = quga.qq
+            inner join qq_groups qg on quga.gid = qg.gid
+            where qg.send_email_group = :send_email_group and qu.sent = 0
+            limit :limit
+        """)
+        result = session.execute(sql, {"send_email_group": send_email_group, "limit": limit})
+        return [row[0] for row in result]
+
+
+def set_sent_status(all_qqs: List[int]):
+    with DbSession() as session:
+        sql = text("""
+            update qq_users set sent = 1 where qq in :qqs
+        """)
+        session.execute(sql, {"qqs": all_qqs})
+        session.commit()

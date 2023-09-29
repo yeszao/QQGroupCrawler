@@ -28,6 +28,7 @@ class QqUser(BaseEntity):
     qq = Column(BigInteger, nullable=False, unique=True)
     gender = Column(String(2), nullable=False)
     qq_age = Column(String(5), nullable=False)
+    sent = Column(Boolean, nullable=False, default=False)
     qq_created_at = Column(Date, nullable=False, default=date.today)
 
 
