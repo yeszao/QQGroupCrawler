@@ -63,6 +63,8 @@ def get_qqs(send_email_group: str, limit: int) -> List[int]:
 
 
 def set_sent_status(all_qqs: List[int]):
+    if len(all_qqs) == 0:
+        return
     with DbSession() as session:
         sql = text("""
             update qq_users set sent = 1 where qq in :qqs

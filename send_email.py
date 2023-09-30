@@ -1,5 +1,9 @@
+import time
+import itertools
+
 from db.dao import get_qqs, set_sent_status
 from mail.aliyun import send_email
+from socks import  GeneralProxyError, ProxyConnectionError
 
 subject = "机会难得！美国【高级PHP开发工程师】职位推荐"
 content = """
@@ -27,18 +31,43 @@ content = """
 <p>润拉拉招聘顾问</p>
 """
 
+sender_list = [
+    "customer@maila.runlala.org",
+    "customer@mailb.runlala.org",
+    "customer@mailc.runlala.org",
+    "customer@maild.runlala.org",
+    "customer@maile.runlala.org",
+]
+senders = itertools.cycle(sender_list)
 
-while True:
-    qqs = get_qqs('php', 30)
-    if len(qqs) == 0:
-        break
 
-    print(f"Sending emails to {qqs[0]} - {qqs[-1]}")
-    emails = [str(qq) + "@qq.com" for qq in qqs]
-    #emails = ["guozao.m@gmail.com", "gary.meng87@gmail.com"]
+def start_send():
+    while True:
+        qqs = get_qqs('php', 5)
+        if len(qqs) == 0:
+            break
 
-    send_email(emails, subject, content)
-    set_sent_status(qqs)
-    print(f"[{len(emails)}] emails sent.")
+        sender = senders.__next__()
+        emails = [str(qq) + "@qq.com" for qq in qqs]
+        print(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender}")
 
-print("All done.")
+        try:
+            failed = send_email(sender, emails, subject, content)
+            failed_qq = []
+            if len(failed) > 0:
+                for email, fail_mgs in failed.items():
+                    failed_qq.append(int(email.split('@')[0]))
+
+            set_sent_status([qq for qq in qqs if qq not in failed_qq])
+            print(f"Total [{len(qqs)}], failed [{len(failed)}], success [{len(qqs) - len(failed)}]")
+        except (GeneralProxyError, ProxyConnectionError) as e:
+            print(f"Error and continue: {e}")
+            continue
+
+        time.sleep(3)
+
+    print("All done.")
+
+
+if __name__ == '__main__':
+    start_send()
