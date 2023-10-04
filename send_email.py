@@ -59,6 +59,7 @@ def loop_send_group(group):
                     failed_qq.append(int(email.split('@')[0]))
 
             set_sent_status([qq for qq in qqs if qq not in failed_qq])
+            sender.last_sent_date = today
             sender.last_sent_count += len(qqs)
             increase_sender_count(sender.id, len(qqs))
 
