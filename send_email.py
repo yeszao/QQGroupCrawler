@@ -2,18 +2,16 @@ import itertools
 import time
 from socks import GeneralProxyError, ProxyConnectionError
 
-from db.dao import get_qqs, set_sent_status, get_email_template, get_all_groups, get_group_by_gid
+from db.dao import get_qqs, set_sent_status, get_email_template, get_all_groups, get_group_by_gid, get_all_senders, \
+    increase_sender_count
 from mail.aliyun import send_email
+from utils import get_today
 
 TEST_GID = 10
-sender_list = [
-    "customer@maila.runlala.org",
-    "customer@mailb.runlala.org",
-    "customer@mailc.runlala.org",
-    "customer@maild.runlala.org",
-    "customer@maile.runlala.org",
-]
-senders = itertools.cycle(sender_list)
+SEND_BATCH_SIZE = 5
+DAILY_SEND_COUNT_OF_ONE_SENDER = 100
+all_senders = get_all_senders()
+senders = itertools.cycle(all_senders)
 
 
 def get_template(variable_id: int) -> (str, str):
@@ -33,20 +31,25 @@ def start_send():
         if group.email_variable_id == 0:
             continue
         loop_send_group(group)
+        print(f"Done for group {group.gid} - {group.name}")
 
     print("All done.")
 
 
 def loop_send_group(group):
     while True:
-        qqs = get_qqs(group.gid, 5)
+        qqs = get_qqs(group.gid, SEND_BATCH_SIZE)
         if len(qqs) == 0:
             break
+        emails = [str(qq) + "@qq.com" for qq in qqs]
 
         sender = senders.__next__()
-        emails = [str(qq) + "@qq.com" for qq in qqs]
-        print(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender}")
+        today = get_today()
+        if sender.last_sent_date == today and sender.last_sent_count > DAILY_SEND_COUNT_OF_ONE_SENDER:
+            print(f"Sender {sender.email} has sent {sender.last_sent_count} emails today, skip.")
+            continue
 
+        print(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender.email}")
         subject, content = get_template(group.email_variable_id)
         try:
             failed = send_email(sender, emails, subject, content)
@@ -56,6 +59,9 @@ def loop_send_group(group):
                     failed_qq.append(int(email.split('@')[0]))
 
             set_sent_status([qq for qq in qqs if qq not in failed_qq])
+            sender.last_sent_count += len(qqs)
+            increase_sender_count(sender.id, len(qqs))
+
             print(f"Total [{len(qqs)}], failed [{len(failed)}], success [{len(qqs) - len(failed)}]")
         except (GeneralProxyError, ProxyConnectionError) as e:
             print(f"Error and continue: {e}")
@@ -63,8 +69,7 @@ def loop_send_group(group):
 
         time.sleep(3)
 
-    print(f"Done for group {group.gid} - {group.name}")
-
 
 if __name__ == '__main__':
-    loop_send_group(get_group_by_gid(TEST_GID))
+    start_send()
+    # loop_send_group(get_group_by_gid(TEST_GID))

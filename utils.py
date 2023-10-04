@@ -10,6 +10,10 @@ def get_now() -> datetime:
     return datetime.now(tz=tz)
 
 
+def get_today():
+    return date.today()
+
+
 def format_date(d: str) -> date:
     try:
         return datetime.strptime(d, "%Y/%m/%d").date()

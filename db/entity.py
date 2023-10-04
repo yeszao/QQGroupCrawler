@@ -58,5 +58,15 @@ class EmailVariable(BaseEntity):
     variables = Column(JSON, nullable=False)
 
 
+class Sender(BaseEntity):
+    __tablename__ = 'senders'
+    email = Column(String(100), nullable=False, unique=True)
+    password = Column(String(100), nullable=False)
+    smtp_server = Column(String(100), nullable=False)
+    smtp_port = Column(Integer, nullable=False)
+    last_sent_date = Column(Date, nullable=False, default=date.min)
+    last_sent_count = Column(Integer, nullable=False, default=0)
+
+
 if __name__ == '__main__':
     Base.metadata.create_all(DbEngine)

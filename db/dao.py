@@ -2,7 +2,8 @@ from typing import List
 from sqlalchemy import text
 from com.models import GroupMember
 from db.engine import DbSession
-from db.entity import QqGroup, QqUser, qq_users_groups_association, EmailVariable, EmailTemplate
+from db.entity import QqGroup, QqUser, qq_users_groups_association, EmailVariable, EmailTemplate, Sender
+from utils import get_today
 
 
 def get_groups() -> List[QqGroup]:
@@ -20,6 +21,23 @@ def set_group_crawled(gid: int):
 def get_all_groups() -> List[QqGroup]:
     with DbSession() as session:
         return session.query(QqGroup).all()
+
+
+def get_all_senders() -> List[Sender]:
+    with DbSession() as session:
+        return session.query(Sender).all()
+
+
+def increase_sender_count(sender_id: int, num: int):
+    today = get_today()
+    with DbSession() as session:
+        sender = session.query(Sender).filter(Sender.id == sender_id).first()
+        if sender.last_sent_date == today:
+            sender.last_sent_count += num
+        else:
+            sender.last_sent_date = today
+            sender.last_sent_count = num
+        session.commit()
 
 
 def get_group_by_gid(gid: int) -> QqGroup:

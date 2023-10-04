@@ -5,14 +5,12 @@ from email.utils import formataddr
 import requests
 import socks
 
+from db.entity import Sender
 
-def send_email(sender, receivers, subject, body) -> dict:
+
+def send_email(sender: Sender, receivers, subject, body) -> dict:
     msg = EmailMessage()
-    port = 465
-    host = "smtpdm.aliyun.com"
-    password = "UkB78yxqf0t"
-
-    msg['From'] = formataddr(('润拉拉', sender))
+    msg['From'] = formataddr(('润拉拉', sender.email))
     # msg['To'] = receivers
     msg['Bcc'] = receivers
     msg['Subject'] = subject
@@ -24,8 +22,8 @@ def send_email(sender, receivers, subject, body) -> dict:
     # proxy.setproxy(socks.HTTP, proxy_ip, proxy_port)
     # proxy.connect((host, port))
 
-    with smtplib.SMTP_SSL(host, port, timeout=10) as server:
-        server.login(sender, password)
+    with smtplib.SMTP_SSL(sender.smtp_server, sender.smtp_port, timeout=10) as server:
+        server.login(sender.email, sender.password)
         return server.send_message(msg)
 
 
