@@ -1,5 +1,6 @@
 from datetime import datetime, date
-from sqlalchemy import Column, Integer, BigInteger, String, DateTime, Date, Text, ForeignKey, Table, Boolean
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, Date, Text, ForeignKey, Table, Boolean, JSON
+from sqlalchemy.orm import relationship
 
 from db.engine import Base, DbEngine
 
@@ -38,6 +39,23 @@ class QqGroup(BaseEntity):
     name = Column(Text, nullable=False)
     login_qq = Column(BigInteger, nullable=False)
     crawled = Column(Boolean, nullable=False, default=False)
+    email_variable_id = Column(Integer, nullable=False, default=0)
+
+
+class EmailTemplate(BaseEntity):
+    __tablename__ = 'email_templates'
+    name = Column(String(100), nullable=False, unique=True)
+    subject = Column(String(100), nullable=False)
+    content = Column(Text, nullable=False)
+
+    email_variables = relationship("EmailVariable", back_populates="template")
+
+
+class EmailVariable(BaseEntity):
+    __tablename__ = 'email_variables'
+    template_id = Column(Integer, ForeignKey('email_templates.id'))
+    template = relationship("EmailTemplate", back_populates="email_variables")
+    variables = Column(JSON, nullable=False)
 
 
 if __name__ == '__main__':
