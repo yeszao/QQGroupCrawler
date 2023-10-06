@@ -9,9 +9,10 @@ from utils import get_today
 
 TEST_GID = 10
 SEND_BATCH_SIZE = 5
-DAILY_SEND_COUNT_OF_ONE_SENDER = 100
+DAILY_SEND_COUNT_OF_ONE_SENDER = 150
 all_senders = get_all_senders()
 senders = itertools.cycle(all_senders)
+done_senders = set()
 
 
 def get_template(variable_id: int) -> (str, str):
@@ -46,8 +47,14 @@ def loop_send_group(group):
         sender = senders.__next__()
         today = get_today()
         if sender.last_sent_date == today and sender.last_sent_count > DAILY_SEND_COUNT_OF_ONE_SENDER:
-            print(f"Sender {sender.email} has sent {sender.last_sent_count} emails today, skip.")
-            continue
+            done_senders.add(sender.id)
+
+            if len(done_senders) == len(all_senders):
+                print("All senders have sent enough emails today, stop.")
+                break
+            else:
+                print(f"Sender {sender.email} has sent {sender.last_sent_count} emails today, skip.")
+                continue
 
         print(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender.email}")
         subject, content = get_template(group.email_variable_id)
