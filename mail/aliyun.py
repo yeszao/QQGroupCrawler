@@ -22,7 +22,7 @@ def send_email(sender: Sender, receivers, subject, body) -> dict:
     # proxy.setproxy(socks.HTTP, proxy_ip, proxy_port)
     # proxy.connect((host, port))
 
-    with smtplib.SMTP_SSL(sender.smtp_server, sender.smtp_port, timeout=10) as server:
+    with smtplib.SMTP_SSL(sender.smtp_server, sender.smtp_port, timeout=20) as server:
         server.login(sender.email, sender.password)
         return server.send_message(msg)
 
