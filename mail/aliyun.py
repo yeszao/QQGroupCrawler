@@ -1,13 +1,14 @@
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr
-
+from tenacity import wait_random_exponential, stop_after_attempt, retry
 import requests
 import socks
 
 from db.entity import Sender
 
 
+@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(3))
 def send_email(sender: Sender, receivers, subject, body) -> dict:
     msg = EmailMessage()
     msg['From'] = formataddr(('润拉拉', sender.email))
