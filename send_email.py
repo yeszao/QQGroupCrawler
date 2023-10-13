@@ -32,7 +32,6 @@ def start_send():
         if group.email_variable_id == 0:
             continue
         loop_send_group(group)
-        logging.info(f"Done for group {group.gid} - {group.name}")
 
     logging.info("All done.")
 
