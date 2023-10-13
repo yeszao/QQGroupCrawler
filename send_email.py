@@ -1,7 +1,7 @@
 import itertools
 import time
 from socks import GeneralProxyError, ProxyConnectionError
-
+import logging
 from db.dao import get_qqs, set_sent_status, get_email_template, get_all_groups, get_group_by_gid, get_all_senders, \
     increase_sender_count
 from mail.aliyun import send_email
@@ -32,9 +32,9 @@ def start_send():
         if group.email_variable_id == 0:
             continue
         loop_send_group(group)
-        print(f"Done for group {group.gid} - {group.name}")
+        logging.info(f"Done for group {group.gid} - {group.name}")
 
-    print("All done.")
+    logging.info("All done.")
 
 
 def loop_send_group(group):
@@ -50,13 +50,13 @@ def loop_send_group(group):
             done_senders.add(sender.id)
 
             if len(done_senders) == len(all_senders):
-                print("All senders have sent enough emails today, stop.")
+                logging.info("All senders have sent enough emails today, stop.")
                 break
             else:
-                print(f"Sender {sender.email} has sent {sender.last_sent_count} emails today, skip.")
+                logging.info(f"Sender {sender.email} has sent {sender.last_sent_count} emails today, skip.")
                 continue
 
-        print(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender.email}")
+        logging.info(f"Sending emails to {qqs[0]} - {qqs[-1]} with {sender.email}")
         subject, content = get_template(group.email_variable_id)
         try:
             failed = send_email(sender, emails, subject, content)
@@ -70,14 +70,22 @@ def loop_send_group(group):
             sender.last_sent_count += len(qqs)
             increase_sender_count(sender.id, len(qqs))
 
-            print(f"Total [{len(qqs)}], failed [{len(failed)}], success [{len(qqs) - len(failed)}]")
+            logging.info(f"Total [{len(qqs)}], failed [{len(failed)}], success [{len(qqs) - len(failed)}]")
         except (GeneralProxyError, ProxyConnectionError) as e:
-            print(f"Error and continue: {e}")
+            logging.info(f"Error and continue: {e}")
             continue
 
         time.sleep(3)
 
 
+def init_log():
+    logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
+                        datefmt='%Y-%d-%m %I:%M:%S',
+                        level=logging.DEBUG,
+                        handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
+
+
 if __name__ == '__main__':
+    init_log()
     start_send()
     # loop_send_group(get_group_by_gid(TEST_GID))
